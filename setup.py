@@ -16,7 +16,7 @@ setup(
     install_requires=[
         'nydus==0.11.0',
         'redis>=2.7.2',
-        'python-dateutil==1.5',
+        'python-dateutil>=1.5, !=2.0',
     ],
     tests_require=[
         'nose>=1.0',
