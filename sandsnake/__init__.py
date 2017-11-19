@@ -19,7 +19,7 @@ from sandsnake.utils import import_string
 
 try:
     VERSION = __import__('pkg_resources') \
-        .get_distribution('analytics').version
+        .get_distribution('sandsnake').version
 except Exception, e:
     VERSION = 'unknown'
 
