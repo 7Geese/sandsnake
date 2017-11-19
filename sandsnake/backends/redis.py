@@ -15,16 +15,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
-from sandsnake.backends.base import BaseSandsnakeBackend
-from sandsnake.exceptions import SandsnakeValidationException
-
-from nydus.db import create_cluster
-
-from dateutil.parser import parse
-
 import calendar
 import datetime
 import itertools
+
+import six
+from dateutil.parser import parse
+from nydus.db import create_cluster
+
+from sandsnake.backends.base import BaseSandsnakeBackend
+from sandsnake.exceptions import SandsnakeValidationException
 
 
 class Redis(BaseSandsnakeBackend):
@@ -234,10 +234,10 @@ class Redis(BaseSandsnakeBackend):
             for index in indexes:
                 if after:
                     results.append(conn.zrangebyscore(self._get_index_name(obj, index), timestamp, \
-                        "+inf", start=0, num=limit, withscores=True, score_cast_func=long))
+                        "+inf", start=0, num=limit, withscores=True, score_cast_func=int))
                 else:
                     results.append(conn.zrevrangebyscore(self._get_index_name(obj, index), timestamp, \
-                        "-inf", start=0, num=limit, withscores=True, score_cast_func=long))
+                        "-inf", start=0, num=limit, withscores=True, score_cast_func=int))
 
         results = self._post_get(results, obj, index_name, marker, limit, \
             after, withscores, **kwargs)
@@ -318,8 +318,8 @@ class Redis(BaseSandsnakeBackend):
 
         :type obj: string
         :param obj: string representation of the object for who the index belongs to
-        :type index_name: string
-        :param index_name: the name of the index
+        :type index: string
+        :param index: the name of the index
         """
         return "%(prefix)sobj:%(obj)s:index:%(index)s" % {'prefix': self._prefix, 'obj': obj, 'index': index}
 
@@ -339,7 +339,7 @@ class Redis(BaseSandsnakeBackend):
         :type list_or_string: string or list
         :param list_or_string: the name of things as a string or a list of strings
         """
-        if isinstance(list_or_string, basestring):
+        if isinstance(list_or_string, six.string_types):
             list_or_string = [list_or_string]
         else:
             list_or_string = list_or_string
@@ -355,7 +355,7 @@ class Redis(BaseSandsnakeBackend):
         """
         dt = None
         if date is None or not isinstance(date, datetime.datetime):
-            if isinstance(date, basestring):
+            if isinstance(date, six.string_types):
                 try:
                     dt = parse(date)
                 except ValueError:
@@ -370,7 +370,7 @@ class Redis(BaseSandsnakeBackend):
         """
         returns a unix timestamp representing the ``datetime`` object
         """
-        return long((calendar.timegm(dt_obj.utctimetuple()) * 1000)) + (dt_obj.microsecond / 1000)
+        return int((calendar.timegm(dt_obj.utctimetuple()) * 1000)) + (dt_obj.microsecond / 1000)
 
 
 class RedisWithMarker(Redis):
@@ -411,7 +411,7 @@ class RedisWithMarker(Redis):
         marker_names = map(lambda marker: self._get_index_marker_name(index_name, marker_name=marker), markers)
         results = self._backend.hmget(self._get_obj_markers_name(obj), marker_names)
 
-        parsed_results = [(None if result is None else long(result)) for result in results]
+        parsed_results = [(None if result is None else int(result)) for result in results]
         if len(parsed_results) == 1:
             return parsed_results[0]
         return parsed_results
@@ -428,7 +428,7 @@ class RedisWithMarker(Redis):
         marker_name = self._get_index_marker_name(index_name)
         result = self._backend.hget(self._get_obj_markers_name(obj), marker_name)
 
-        return None if result is None else long(result)
+        return None if result is None else int(result)
 
     def _post_delete_index(self, obj, indexes):
         """
@@ -484,13 +484,13 @@ class RedisWithBubbling(RedisWithMarker):
         to the current utc timestamp.
         """
         for key, value in values_dict.items():
-            #we we did not provide a custom score, then just set it the the current timestamp
+            # we we did not provide a custom score, then just set it the the current timestamp
             if value is None:
                 score = self._get_timestamp(datetime.datetime.utcnow())
             else:
-                #Try to parse the score as a long. If it doesn't work, try to parse a date.
+                # Try to parse the score as a long. If it doesn't work, try to parse a date.
                 try:
-                    score = long(value)
+                    score = int(value)
                 except (ValueError, TypeError):
                     score = self._get_timestamp(self._parse_date(date=value))
             values_dict[key] = score

@@ -15,12 +15,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 """
+import six
+
 from sandsnake.utils import import_string
 
 try:
     VERSION = __import__('pkg_resources') \
         .get_distribution('sandsnake').version
-except Exception, e:
+except Exception as e:
     VERSION = 'unknown'
 
 
@@ -45,7 +47,7 @@ def create_sandsnake_backend(settings):
     >>> })
     """
     backend = settings.get('backend')
-    if isinstance(backend, basestring):
+    if isinstance(backend, six.string_types):
         backend = import_string(backend)
     elif backend:
         backend = backend

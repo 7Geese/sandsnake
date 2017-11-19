@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 from setuptools import setup, find_packages
 
 setup(
@@ -17,6 +16,7 @@ setup(
         'nydus==0.11.0',
         'redis>=2.7.2',
         'python-dateutil>=1.5, !=2.0',
+        'six',
     ],
     tests_require=[
         'nose>=1.0',
