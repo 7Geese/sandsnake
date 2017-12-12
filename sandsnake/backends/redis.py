@@ -269,7 +269,7 @@ class Redis(BaseSandsnakeBackend):
         else:
             processed_values = []
             for result in results:
-                processed_values.append(map(lambda x: x[0], result))
+                processed_values.append([x[0] for x in result])
 
         return processed_values
 
@@ -408,7 +408,7 @@ class RedisWithMarker(Redis):
         """
         markers = self._listify(marker)
 
-        marker_names = map(lambda marker: self._get_index_marker_name(index_name, marker_name=marker), markers)
+        marker_names = [self._get_index_marker_name(index_name, marker_name=marker) for marker in markers]
         results = self._backend.hmget(self._get_obj_markers_name(obj), marker_names)
 
         parsed_results = [(None if result is None else int(result)) for result in results]

@@ -113,7 +113,7 @@ class TestRedisBackend(object):
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.insert(0, value)
 
-        values = map(lambda val: (val[0], self._backend._get_timestamp(val[1])), values)
+        values = [(val[0], self._backend._get_timestamp(val[1])) for val in values]
 
         eq_(self._redis_backend.zcard(self._backend._get_index_name(obj, index_name)), 7)
         eq_(self._redis_backend.scard(self._backend._get_index_collection_name(obj)), 1)
@@ -140,7 +140,7 @@ class TestRedisBackend(object):
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.insert(0, value)
 
-        values = map(lambda val: (val[0], self._backend._get_timestamp(val[1])), values)
+        values = [(val[0], self._backend._get_timestamp(val[1])) for val in values]
 
         eq_(self._redis_backend.zcard(self._backend._get_index_name(obj, index_name)), 7)
         eq_(self._redis_backend.scard(self._backend._get_index_collection_name(obj)), 1)
