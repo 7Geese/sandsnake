@@ -27,8 +27,8 @@ class TestRedisBackend(object):
         self._redis_backend.flushdb()
 
     def test_get_timestamp(self):
-        jan_first = datetime.datetime(2012, 01, 01, 12, 0, 0, 0)
-        eq_(1325419200000L, self._backend._get_timestamp(jan_first))
+        jan_first = datetime.datetime(2012, 1, 1, 12, 0, 0, 0)
+        eq_(1325419200000, self._backend._get_timestamp(jan_first))
 
     def _setup_basic_index(self):
         self.obj = "indexes"
@@ -41,7 +41,7 @@ class TestRedisBackend(object):
 
     def test_parse_date(self):
         datetime_string = "2012-01-01T12:00:00"
-        datetime_obj = datetime.datetime(2012, 01, 01, 12, 0, 0, 0)
+        datetime_obj = datetime.datetime(2012, 1, 1, 12, 0, 0, 0)
         invalid_datetime = "qwerty"
 
         now = datetime.datetime.utcnow()
@@ -420,15 +420,15 @@ class TestRedisWithMarkerBackend(object):
         index_name = "profile_index"
         marker_name = "test marker"
 
-        self._redis_backend.hmset(self._backend._get_obj_markers_name(obj), {self._backend._get_index_marker_name(index_name, marker_name=marker_name): 25L})
+        self._redis_backend.hmset(self._backend._get_obj_markers_name(obj), {self._backend._get_index_marker_name(index_name, marker_name=marker_name): 25})
 
         marker_value = self._backend.get_markers(obj, index_name, marker_name)
-        eq_(marker_value, 25L)
+        eq_(marker_value, 25)
 
     def test_get_markers_multiple_marker(self):
         obj = "indexes"
         index_name = "profile_index"
-        marker_names_dict = {"test marker": 25L, "test marker 2": 40L, "test marker 3": 50L}
+        marker_names_dict = {"test marker": 25, "test marker 2": 40, "test marker 3": 50}
 
         parsed_markers_dict = {}
         for key, value in list(marker_names_dict.items()):
@@ -451,7 +451,7 @@ class TestRedisWithMarkerBackend(object):
     def test_set_markers_multiple_marker(self):
         obj = "indexes"
         index_name = "profile_index"
-        marker_names_dict = {"test marker": 25L, "test marker 2": 40L, "test marker 3": 50L}
+        marker_names_dict = {"test marker": 25, "test marker 2": 40, "test marker 3": 50}
 
         self._backend.set_markers(obj, index_name, marker_names_dict)
 
