@@ -68,7 +68,7 @@ class Redis(BaseSandsnakeBackend):
 
             Very expensive and destructive operation. Use with causion
         """
-        keys = self._backend.keys()
+        keys = list(self._backend.keys())
 
         for key in itertools.chain(*keys):
             with self._backend.map() as conn:
@@ -390,7 +390,7 @@ class RedisWithMarker(Redis):
         :param markers_dict: a dictionary when they keys are the marker names and values are the marker's new value. If the marker does not exist, it will be created
         """
         parsed_marker_dict = {}
-        for key, value in markers_dict.items():
+        for key, value in list(markers_dict.items()):
             parsed_marker_dict[self._get_index_marker_name(index_name, marker_name=key)] = value
 
         self._backend.hmset(self._get_obj_markers_name(obj), parsed_marker_dict)
@@ -483,7 +483,7 @@ class RedisWithBubbling(RedisWithMarker):
         score for the activity. You can pass ``None`` as the score for any activity and it will assign the score
         to the current utc timestamp.
         """
-        for key, value in values_dict.items():
+        for key, value in list(values_dict.items()):
             # we we did not provide a custom score, then just set it the the current timestamp
             if value is None:
                 score = self._get_timestamp(datetime.datetime.utcnow())

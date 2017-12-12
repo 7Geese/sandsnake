@@ -431,11 +431,11 @@ class TestRedisWithMarkerBackend(object):
         marker_names_dict = {"test marker": 25L, "test marker 2": 40L, "test marker 3": 50L}
 
         parsed_markers_dict = {}
-        for key, value in marker_names_dict.items():
+        for key, value in list(marker_names_dict.items()):
             parsed_markers_dict[self._backend._get_index_marker_name(index_name, marker_name=key)] = value
         self._redis_backend.hmset(self._backend._get_obj_markers_name(obj), parsed_markers_dict)
 
-        markers = marker_names_dict.keys()
+        markers = list(marker_names_dict.keys())
         marker_values = self._backend.get_markers(obj, index_name, markers)
         for marker, marker_value in zip(markers, marker_values):
             eq_(marker_value, marker_names_dict[marker])
@@ -455,7 +455,7 @@ class TestRedisWithMarkerBackend(object):
 
         self._backend.set_markers(obj, index_name, marker_names_dict)
 
-        markers = marker_names_dict.keys()
+        markers = list(marker_names_dict.keys())
         for marker in markers:
             eq_(long(self._redis_backend.hget(self._backend._get_obj_markers_name(obj),\
                             self._backend._get_index_marker_name(index_name, marker_name=marker))), marker_names_dict[marker])
@@ -491,11 +491,11 @@ class TestRedisWithBubblingBackend(object):
 
         redis_client = self._backend.get_backend()
 
-        ok_(not len(list(itertools.chain(*redis_client.keys()))) == 0)
+        ok_(not len(list(itertools.chain(*list(redis_client.keys())))) == 0)
 
         self._backend.clear_all()
 
-        ok_(len(list(itertools.chain(*redis_client.keys()))) == 0)
+        ok_(len(list(itertools.chain(*list(redis_client.keys())))) == 0)
 
     def test_bubble_values(self):
         published = datetime.datetime.utcnow()
