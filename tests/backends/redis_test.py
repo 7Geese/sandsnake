@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
-from nose.tools import ok_, eq_, raises, set_trace
+import datetime
+import itertools
+
+from nose.tools import eq_, ok_, raises
+from six.moves import range
 
 from sandsnake import create_sandsnake_backend
 from sandsnake.exceptions import SandsnakeValidationException
-
-import datetime
-import itertools
 
 
 class TestRedisBackend(object):
@@ -20,7 +21,7 @@ class TestRedisBackend(object):
 
         self._redis_backend = self._backend.get_backend()
 
-        #clear the redis database so we are in a consistent state
+        # clear the redis database so we are in a consistent state
         self._redis_backend.flushdb()
 
     def tearDown(self):
@@ -103,12 +104,12 @@ class TestRedisBackend(object):
         index_name = "profile_index"
 
         values = []
-        for i in xrange(5):
+        for i in range(5):
             value = ("activity_after_" + str(i), published + datetime.timedelta(seconds=i),)
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.append(value)
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             value = ("activity_before_" + str(i), published - datetime.timedelta(seconds=i),)
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.insert(0, value)
@@ -130,12 +131,12 @@ class TestRedisBackend(object):
         index_name = "profile_index"
 
         values = []
-        for i in xrange(5):
+        for i in range(5):
             value = ("activity_after_" + str(i), published + datetime.timedelta(seconds=i),)
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.append(value)
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             value = ("activity_before_" + str(i), published - datetime.timedelta(seconds=i),)
             self._backend.add(obj, index_name, value[0], published=value[1])
             values.insert(0, value)
@@ -238,33 +239,33 @@ class TestRedisBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         #get all values after the marker
         result = self._backend.get(obj, index_name, marker=published)
 
         eq_(len(result), 3)
-        eq_(['activity_after_0'] + ["activity_before_" + str(i) for i in xrange(1, 3)], result)
+        eq_(['activity_after_0'] + ["activity_before_" + str(i) for i in range(1, 3)], result)
 
         #get all values before the marker
         result = self._backend.get(obj, index_name, marker=published, after=True)
 
         eq_(len(result), 5)
-        eq_(["activity_after_" + str(i) for i in xrange(5)], result)
+        eq_(["activity_after_" + str(i) for i in range(5)], result)
 
     def test_get_limit(self):
         published = datetime.datetime.now()
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         #get all values after the marker
@@ -277,7 +278,7 @@ class TestRedisBackend(object):
         result = self._backend.get(obj, index_name, marker=published, after=True, limit=2)
 
         eq_(len(result), 2)
-        eq_(["activity_after_" + str(i) for i in xrange(2)], result)
+        eq_(["activity_after_" + str(i) for i in range(2)], result)
 
     @raises(SandsnakeValidationException)
     def test_get_marker_required(self):
@@ -366,10 +367,10 @@ class TestRedisWithMarkerBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         eq_(3, self._backend.get_count(obj, index_name, published))
@@ -380,10 +381,10 @@ class TestRedisWithMarkerBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 3):
+        for i in range(1, 3):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         eq_(self._redis_backend.hget(self._backend._get_obj_markers_name(obj),\
@@ -401,10 +402,10 @@ class TestRedisWithMarkerBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 5):
+        for i in range(1, 5):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         #adding stuff does not change the default marker
@@ -483,10 +484,10 @@ class TestRedisWithBubblingBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(2):
+        for i in range(2):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 2):
+        for i in range(1, 2):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         redis_client = self._backend.get_backend()
@@ -502,10 +503,10 @@ class TestRedisWithBubblingBackend(object):
         obj = "indexes"
         index_name = "profile_index"
 
-        for i in xrange(5):
+        for i in range(5):
             self._backend.add(obj, index_name, "activity_after_" + str(i), published=published + datetime.timedelta(seconds=i))
 
-        for i in xrange(1, 5):
+        for i in range(1, 5):
             self._backend.add(obj, index_name, "activity_before_" + str(i), published=published - datetime.timedelta(seconds=i))
 
         eq_(self._redis_backend.hget(self._backend._get_obj_markers_name(obj),\
@@ -532,4 +533,3 @@ class TestRedisWithBubblingBackend(object):
 
         eq_(len(result), 3)
         eq_(['activity_after_1', 'activity_after_0', 'activity_after_4'], result)
-
