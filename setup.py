@@ -1,5 +1,7 @@
 #!/usr/bin/python
-from setuptools import setup, find_packages
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from setuptools import find_packages, setup
 
 setup(
     name="sandsnake",
