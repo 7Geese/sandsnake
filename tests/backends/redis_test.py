@@ -457,7 +457,7 @@ class TestRedisWithMarkerBackend(object):
 
         markers = list(marker_names_dict.keys())
         for marker in markers:
-            eq_(long(self._redis_backend.hget(self._backend._get_obj_markers_name(obj),\
+            eq_(int(self._redis_backend.hget(self._backend._get_obj_markers_name(obj),\
                             self._backend._get_index_marker_name(index_name, marker_name=marker))), marker_names_dict[marker])
 
 
