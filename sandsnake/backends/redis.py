@@ -133,7 +133,7 @@ class Redis(BaseSandsnakeBackend):
             for index in indexes:
                 index_name = self._get_index_name(obj, index)
                 indexes_added.append(index_name)
-                conn.zadd(index_name, timestamp, activity)
+                conn.zadd(index_name, {activity: timestamp})
                 conn.sadd(self._get_index_collection_name(obj), index)
 
         self._post_add(obj, indexes_added, activity, timestamp)
@@ -496,4 +496,4 @@ class RedisWithBubbling(RedisWithMarker):
                     score = self._get_timestamp(self._parse_date(date=value))
             values_dict[key] = score
 
-        self._backend.zadd(self._get_index_name(obj, index_name), **values_dict)
+        self._backend.zadd(self._get_index_name(obj, index_name), values_dict)
