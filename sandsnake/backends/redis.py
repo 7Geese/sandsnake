@@ -394,7 +394,7 @@ class RedisWithMarker(Redis):
         for key, value in list(markers_dict.items()):
             parsed_marker_dict[self._get_index_marker_name(index_name, marker_name=key)] = value
 
-        self._backend.hset(self._get_obj_markers_name(obj), mapping=markers_dict)
+        self._backend.hset(self._get_obj_markers_name(obj), mapping=parsed_marker_dict)
 
     def get_markers(self, obj, index_name, marker, **kwargs):
         """
